@@ -1,3 +1,5 @@
+// todo zapojeni dratu
+
 // DHT sensor library, version 1.4.0 by Adafruit
 #include <DHT.h>
 
@@ -21,7 +23,7 @@ byte rf24_tx[6] = "RpiMe";    // Address used when transmitting data.
 byte payload[32];             // Payload bytes. Used both for transmitting and receiving
 
 unsigned long last_reading;                // Milliseconds since last measurement was read.
-unsigned long ms_between_reads = 10000;    // 10000 ms = 10 seconds
+unsigned long ms_between_reads = 1000;    // 10000 ms = 10 seconds
 uint32_t counterSendFailed = 0;
 uint8_t counterPackets = 0;
 
@@ -69,6 +71,8 @@ void loop() {
     float t, h, p, v;
     h = dht.readHumidity();
     t = dht.readTemperature();
+    p = millis() % 1000;
+    v = 1.45;
     
     // Report the temperature and humidity.    
     Serial.print("Sensor values: temperature="); Serial.print(t); 
