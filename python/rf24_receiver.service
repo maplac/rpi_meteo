@@ -1,0 +1,13 @@
+  [Unit]
+  Description=RF24 receiver for RpiMeteo
+  Requires=pigpiod.service
+
+  [Service]
+  Type=simple
+  Restart=on-failure
+  User=pi
+  WorkingDirectory=/home/pi/rpi_meteo/python/
+  ExecStart=/usr/bin/python3 /home/pi/rpi_meteo/python/rf24_receiver.py
+
+  [Install]
+  WantedBy=multi-user.target
