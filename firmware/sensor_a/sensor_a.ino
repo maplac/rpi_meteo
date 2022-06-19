@@ -1,41 +1,56 @@
-// todo zapojeni dratu
 
-// DHT sensor library, version 1.4.0 by Adafruit
 #include <DHT.h>
-
-// RF24, version 1.3.9, by TMRh20
+#include<Vcc.h>
+#include <JeeLib.h>
 #include <printf.h>
 #include <RF24.h>
 
-#define DEVICE_ID 1
+//#define DEBUG_ENABLED 1
 
-#define PIN_DHT                  8            // PIN for DHT sensor communication.
-#define DHT_TYPE              DHT22           // Type of DHT sensor:
-                                              // DHT11, DHT12, DHT21, DHT22 (AM2302), AM2301
-                                      
+#define DEVICE_ID   1
+#define PIN_VOLTAGE A0
+#define PIN_BUTTON  2
+#define PIN_LED     7
+
 // Cretate NRF24L01 radio.
 RF24 radio(10, 9);// CE pin, CSN pin
-
-// Create DHT sensor
-DHT dht(PIN_DHT, DHT_TYPE);
-
 byte rf24_tx[6] = "RpiMe";    // Address used when transmitting data.
 byte payload[32];             // Payload bytes. Used both for transmitting and receiving
 
-unsigned long last_reading;                // Milliseconds since last measurement was read.
-unsigned long ms_between_reads = 1000;    // 10000 ms = 10 seconds
+// Create DHT sensor
+DHT dht(8, DHT22);// pin number, DHT type (DHT11, DHT12, DHT21, DHT22 (AM2302), AM2301)
+
+// flags
+volatile bool isTimeout = false;
+volatile bool isButton = false;
+
 uint32_t counterSendFailed = 0;
 uint8_t counterPackets = 0;
+uint8_t buttonLastState = 3;
+uint32_t counterSendAttempts = 0;
+
+void measureAndSend(void);
+
+ISR(WDT_vect) {
+  Sleepy::watchdogEvent();
+  isTimeout = true;
+}
+
+void buttonInt(void){
+  isButton = true;
+}
 
 void setup() {
-  
-  // Initialize serial connection.
-  Serial.begin(115200);
-  printf_begin();
-  delay(100);
-  
-  // Show that program is starting.
-  Serial.println("\n\nNRF24L01 Arduino Simple Sender.");
+  pinMode(PIN_BUTTON, INPUT);
+  pinMode(PIN_LED, OUTPUT);
+  digitalWrite(PIN_LED, LOW);
+  attachInterrupt(digitalPinToInterrupt(PIN_BUTTON), buttonInt, FALLING);
+  analogReference(DEFAULT);//EXTERNAL
+
+  #ifdef DEBUG_ENABLED
+    Serial.begin(115200);
+    printf_begin();
+  #endif
 
   // Configure the NRF24 tranceiver.
   Serial.println("Configure NRF24 ...");
@@ -50,66 +65,84 @@ void setup() {
   radio.setPayloadSize(32);// Max. 32 bytes.
   radio.openWritingPipe(rf24_tx);
   radio.stopListening();
-  
-  // Show debug information for NRF24 tranceiver.
-  radio.printDetails();
+
+  #ifdef DEBUG_ENABLED
+    // Show debug information for NRF24 tranceiver.
+    radio.printDetails();
+  #endif
   
   // Initialise the DHT sensor.
   dht.begin();
 
-  // Take the current timestamp. This means that the next (first) measurement will be read and
-  // transmitted in "ms_between_reads" milliseconds.
-  last_reading = 0;
+  isTimeout = true;
 }
 
 void loop() {
-
-  if (millis() - last_reading > ms_between_reads) {
-    // Read sensor values every "ms_between_read" milliseconds.
   
-    // Read the humidity and temperature.
-    float t, h, p, v;
-    h = dht.readHumidity();
-    t = dht.readTemperature();
-    p = millis() % 1000;
-    v = 1.45;
-    
-    // Report the temperature and humidity.    
-    Serial.print("Sensor values: temperature="); Serial.print(t); 
-    Serial.print(", humidity="); Serial.println(h);
+  // make sure everything is finished before go to sleep
+  delay(20);
 
-    // Stop listening on the radio (we can't both listen and send).
-    radio.stopListening();
-
-    // Send the data ...
-    int offset = 0;  
-    //Serial.println("Preparing payload.");
-    payload[0] = DEVICE_ID; // id
-    payload[1] = counterPackets; // packet counter
-    payload[2] = 0; // packet type
-    payload[3] = 0; // reserved
-  
-    float *packetF = (float*) &payload; //size_of(float)=4
-    packetF[1] = t;
-    packetF[2] = p;
-    packetF[3] = h;
-    packetF[4] = v;
-  
-    uint32_t *packetUI23 = (uint32_t*) &payload;
-    packetUI23[5] = counterSendFailed;
-  
-    if (radio.write(payload, 32)) {
-      Serial.print("Payload sent successfully. Retries="); Serial.println(radio.getARC());
-    } else {
-      counterSendFailed++;
-      Serial.print("Failed to send payload. Retries="); Serial.println(radio.getARC());
-    }
-    counterPackets++;
-
-    // Start listening again.
-    radio.startListening();
-
-    // Register that we have read the temperature and humidity.
-    last_reading = millis();
+  // wait for button press or timer
+  if (!isButton && !isTimeout){
+    Sleepy::loseSomeTime(60000);
   }
+
+  if (isButton) {
+    delay(20);// debounce
+    if (!digitalRead(PIN_BUTTON)) {
+      measureAndSend();
+    }
+    isButton = false;
+  }
+  if (isTimeout) {
+    isTimeout = false;
+    measureAndSend();
+  }
+}
+
+void measureAndSend(void) {
+   
+  float t, h, v;
+  v = analogRead(PIN_VOLTAGE) * 3.3 / 1024.0;
+  h = dht.readHumidity();
+  t = dht.readTemperature();
+
+  #ifdef DEBUG_ENABLED
+    // Report the temperature and humidity.    
+    Serial.print("temperature = "); Serial.print(t); 
+    Serial.print(", humidity = "); Serial.print(h);
+    Serial.print(", voltage = "); Serial.println(v);
+  #endif
+
+  digitalWrite(PIN_LED, HIGH);
+
+  payload[0] = DEVICE_ID; // id
+  payload[1] = counterPackets; // packet counter
+  payload[2] = 0; // packet type
+  payload[3] = 0; // reserved
+
+  float *packetF = (float*) &payload; //size_of(float)=4
+  packetF[1] = t;
+  packetF[2] = h;
+  packetF[3] = v;
+
+  uint32_t *packetUI23 = (uint32_t*) &payload;
+  packetUI23[5] = counterSendFailed;
+
+  if (radio.write(payload, 32)) {
+    counterSendFailed = 0;
+    #ifdef DEBUG_ENABLED
+      Serial.print("Transfer OK. Retries="); Serial.println(radio.getARC());
+    #endif
+  } else {
+    counterSendFailed++;
+    #ifdef DEBUG_ENABLED
+      Serial.print("Transfer FAILED. Retries="); Serial.println(radio.getARC());
+    #endif
+  }
+  counterPackets++;
+
+  radio.startListening();
+  radio.stopListening();
+  digitalWrite(PIN_LED, LOW);
 }
