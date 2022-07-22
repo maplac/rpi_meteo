@@ -4,21 +4,33 @@
 #include <JeeLib.h>
 #include <printf.h>
 #include <RF24.h>
+#include <OneWire.h> 
+#include <DallasTemperature.h>
 
 //#define DEBUG_ENABLED 1
+#define USE_DHT22     1
+#define USE_DS18      1
 
 #define DEVICE_ID   1
-#define PIN_VOLTAGE A0
+#define PIN_VOLTAGE A4
 #define PIN_BUTTON  2
-#define PIN_LED     7
+#define PIN_LED     17
 
 // Cretate NRF24L01 radio.
-RF24 radio(10, 9);// CE pin, CSN pin
+RF24 radio(14, 10);// CE pin, CSN pin
 byte rf24_tx[6] = "RpiMe";    // Address used when transmitting data.
 byte payload[32];             // Payload bytes. Used both for transmitting and receiving
 
-// Create DHT sensor
-DHT dht(8, DHT22);// pin number, DHT type (DHT11, DHT12, DHT21, DHT22 (AM2302), AM2301)
+#ifdef USE_DHT22
+  // Create DHT sensor
+  DHT dht(19, DHT22);// pin number, DHT type (DHT11, DHT12, DHT21, DHT22 (AM2302), AM2301)
+#endif
+
+#ifdef USE_DS18
+  // Create DS18B20 sensor
+  OneWire oneWire(16);// pin number
+  DallasTemperature ds18(&oneWire);
+#endif
 
 // flags
 volatile bool isTimeout = false;
@@ -57,7 +69,7 @@ void setup() {
   radio.begin();
   radio.enableDynamicPayloads();
   radio.setAutoAck(true);
-  radio.setPALevel(RF24_PA_MIN);
+  radio.setPALevel(RF24_PA_MAX);
   radio.setRetries(5, 15);//Delay bewteen retries, 1..15.  Multiples of 250µs. Number of retries, 1..15.
   radio.setDataRate(RF24_250KBPS);// RF24_2MBPS, RF24_1MBPS, RF24_250KBPS
   radio.setChannel(100);// 0 ... 125
@@ -70,9 +82,11 @@ void setup() {
     // Show debug information for NRF24 tranceiver.
     radio.printDetails();
   #endif
-  
-  // Initialise the DHT sensor.
-  dht.begin();
+
+  #ifdef USE_DHT22
+    // Initialise the DHT sensor.
+    dht.begin();
+  #endif
 
   isTimeout = true;
 }
@@ -88,7 +102,7 @@ void loop() {
   }
 
   if (isButton) {
-    delay(20);// debounce
+    delay(100);// debounce
     if (!digitalRead(PIN_BUTTON)) {
       measureAndSend();
     }
@@ -102,16 +116,31 @@ void loop() {
 
 void measureAndSend(void) {
    
-  float t, h, v;
+  float t, h, v, t2;
   v = analogRead(PIN_VOLTAGE) * 3.3 / 1024.0;
-  h = dht.readHumidity();
-  t = dht.readTemperature();
+  #ifdef USE_DS18
+    ds18.requestTemperatures();
+  #endif
+  #ifdef USE_DHT22
+    h = dht.readHumidity();
+    t = dht.readTemperature();
+  #else
+    h = 0.0;
+    t = 0.0;
+  #endif
+  #ifdef USE_DS18
+    t2 = ds18.getTempCByIndex(0);
+  #else
+    t2 = 0.0;
+  #endif
 
   #ifdef DEBUG_ENABLED
     // Report the temperature and humidity.    
     Serial.print("temperature = "); Serial.print(t); 
+    Serial.print(", temperature2 = "); Serial.print(t2);
     Serial.print(", humidity = "); Serial.print(h);
-    Serial.print(", voltage = "); Serial.println(v);
+    Serial.print(", voltage = "); Serial.print(v);
+    Serial.print(", lostPackets = "); Serial.println(counterSendFailed);
   #endif
 
   digitalWrite(PIN_LED, HIGH);
@@ -123,8 +152,9 @@ void measureAndSend(void) {
 
   float *packetF = (float*) &payload; //size_of(float)=4
   packetF[1] = t;
-  packetF[2] = h;
-  packetF[3] = v;
+  packetF[2] = t2;
+  packetF[3] = h;
+  packetF[4] = v;
 
   uint32_t *packetUI23 = (uint32_t*) &payload;
   packetUI23[5] = counterSendFailed;
