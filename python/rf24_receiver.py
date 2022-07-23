@@ -16,6 +16,7 @@ def gpio_interrupt(gpio, level, tick):
 
     # As long as data is ready for processing, process it.
     while nrf.data_ready():
+      try:
         # Count message and record time of reception.            
         
         # Read pipe and payload for message.
@@ -32,8 +33,8 @@ def gpio_interrupt(gpio, level, tick):
         values = struct.unpack("<BBxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", payload)
         device_id = values[0]
         if device_id == 1:
-          values = struct.unpack("<BBxxfffLxxxxxxxxxxxx", payload)
-          print(f'ID: {values[0]}, counter: {values[1]}, temperature: {values[2]}, humidity: {values[3]}, voltage: {values[4]}, lost: {values[5]}')
+          values = struct.unpack("<BBxxffffLxxxxxxxx", payload)
+          print(f'ID: {values[0]}, counter: {values[1]}, temperature: {values[2]}, temperature2: {values[3]} humidity: {values[4]}, voltage: {values[5]}, lost: {values[6]}')
           msg = [{
             "measurement": "test",
             "tags": {
@@ -41,18 +42,19 @@ def gpio_interrupt(gpio, level, tick):
             },
             "fields": {
               "temperature": values[2],
-              "humidity": values[3],
-              "voltage": values[4],
-              "lost": values[5]
+              "temperature2": values[3],
+              "humidity": values[4],
+              "voltage": values[5],
+              "lost": values[6]
             }
           }]
         
         if len(msg) > 0:
-          try:
-            client = InfluxDBClient(host='127.0.0.1', port=8086, database='home')
-            client.write_points(msg)
-          except Exception as e:
-            print("Error: ", e.__class__, ", ", e)
+          client = InfluxDBClient(host='127.0.0.1', port=8086, database='home')
+          client.write_points(msg)
+          
+      except Exception as e:
+        print("Error: ", e.__class__, ", ", e)
 
 
 if __name__ == "__main__":
@@ -73,7 +75,7 @@ if __name__ == "__main__":
 
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN because test sender/receivers are often close to each other, and then MIN works better.
-    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.MIN)
+    nrf = NRF24(pi, ce=25, payload_size=RF24_PAYLOAD.DYNAMIC, channel=100, data_rate=RF24_DATA_RATE.RATE_250KBPS, pa_level=RF24_PA.MAX)
     nrf.set_address_bytes(len(address))
 
     # Listen on the address specified as parameter
