@@ -1,40 +1,49 @@
 // Board: Arduino Pro Mini
+#include<SoftwareSerial.h>
+#include <printf.h>
 
-#define BUFFER_SIZE 10
-#define PIN_OUT     10
+//#define DEBUG_ENABLED 1
+
+#define AVG_TARGET  10
 #define PIN_IN      A3
+#define PIN_RX       15
+#define PIN_TX       16
 
-int valueBuffer[BUFFER_SIZE];
-int writePointer;
-
-int getAverage(int new_value) {
-  valueBuffer[writePointer] = new_value;
-  writePointer = ++writePointer % BUFFER_SIZE;
-  int avg = 0;
-  for (int i = 0; i < BUFFER_SIZE; ++i) {
-    avg += valueBuffer[i];
-  }
-  avg /= BUFFER_SIZE;
-  return avg;
-}
+SoftwareSerial SerialSoft(PIN_RX, PIN_TX);
+int sum;
+int avgCounter;
 
 void setup() {
-  Serial.begin(115200);
-  pinMode(PIN_OUT, OUTPUT);
+  #ifdef DEBUG_ENABLED
+    Serial.begin(115200);
+    printf_begin();
+  #endif
   
-  int val = analogRead(PIN_IN);
-  for (int i = 0; i < BUFFER_SIZE; ++i) {
-    valueBuffer[i] = val;
-  }
-  writePointer = 0;
+  pinMode(PIN_RX, INPUT);
+  pinMode(PIN_TX, OUTPUT);
+  SerialSoft.begin(9600);
+  
+  sum = analogRead(PIN_IN);
+  avgCounter = 1;
 }
 
 void loop() {
-  int val = getAverage(analogRead(PIN_IN));
-  //Serial.println(val);
-  val /= 4;
-  if (val < 10)
-    val = 10;
-  analogWrite(PIN_OUT, val);
-  delay(200);
+  sum += analogRead(PIN_IN);
+  avgCounter++;
+  if (avgCounter == AVG_TARGET) {
+    sum /= (AVG_TARGET * 4);
+    if (sum < 0) {
+      sum = 0;
+    }
+    if (sum > 255) {
+      sum = 255;
+    }
+    SerialSoft.write((byte) sum);
+    #ifdef DEBUG_ENABLED
+      Serial.println((byte) sum);
+    #endif
+    sum = 0;
+    avgCounter = 0;
+  }
+  delay(100);
 }
