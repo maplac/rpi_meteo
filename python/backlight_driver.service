@@ -1,0 +1,12 @@
+  [Unit]
+  Description=Display backlight driver.
+  
+  [Service]
+  Type=simple
+  Restart=on-failure
+  User=pi
+  WorkingDirectory=/home/pi/rpi_meteo/python/
+  ExecStart=/usr/bin/python3 /home/pi/rpi_meteo/python/backlight_driver.py
+
+  [Install]
+  WantedBy=multi-user.target
