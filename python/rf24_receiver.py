@@ -73,10 +73,10 @@ if __name__ == "__main__":
         sys.exit()
 
     # Setup callback for interrupt triggered when data is received.
-    #pi.callback(23, pigpio.FALLING_EDGE, gpio_interrupt)
+    #pi.callback(24, pigpio.FALLING_EDGE, gpio_interrupt)
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(23, GPIO.IN)
-    GPIO.add_event_detect(23, GPIO.FALLING, callback=gpio_interrupt)
+    GPIO.setup(24, GPIO.IN)
+    GPIO.add_event_detect(24, GPIO.FALLING, callback=gpio_interrupt)
 
     # Create NRF24 object.
     # PLEASE NOTE: PA level is set to MIN because test sender/receivers are often close to each other, and then MIN works better.

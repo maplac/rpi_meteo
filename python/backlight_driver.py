@@ -14,8 +14,7 @@ while True:
       value = 0
     #print(f'corrected: {value}')
     
-    # ignore changes less than 10
-    if abs(value - lastValue) < 10:
+    if value == lastValue:
       continue
       
     lastValue = value
