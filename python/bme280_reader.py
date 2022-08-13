@@ -14,7 +14,7 @@ try:
     #print("Humidity: %0.1f %%" % h)
     #print("Pressure: %0.1f hPa" % p)
     msg = [{
-        "measurement": "test",
+        "measurement": "rpi_meteo",
         "tags": {
             "name": "bme280"
         },

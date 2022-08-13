@@ -38,7 +38,7 @@ def gpio_interrupt(gpio):
           values = struct.unpack("<BBxxffffLxxxxxxxx", payload)
           print(f'ID: {values[0]}, counter: {values[1]}, temperature: {values[2]}, temperature2: {values[3]} humidity: {values[4]}, voltage: {values[5]}, lost: {values[6]}')
           msg = [{
-            "measurement": "test",
+            "measurement": "rpi_meteo",
             "tags": {
               "name": "dht22"
             },
