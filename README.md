@@ -4,6 +4,7 @@ Installation (incomplete)
 
 Install Influx and Grafana.
 https://simonhearne.com/2020/pi-influx-grafana/
+"sudo apt install influxdb-client" if command influx doesn't work.
 
 Add cron jobs.
 $ crontab -e
@@ -35,6 +36,7 @@ Starting Grafana in web browser automatically after boot
 Install Firefox (Chromium stopped working on my Rpi) $sudo apt-get install firefox-esr
 Install ForceFull addon in Firefox. The addon automatically switches the Firefox to fullscreen mode.
 
+Doesn't work:
 Add following lines to file /home/pi/.config/lxsession/LXDE-pi/autostart
 @lxpanel --profile LXDE-pi
 @pcmanfm --desktop --profile LXDE-pi
@@ -42,7 +44,9 @@ Add following lines to file /home/pi/.config/lxsession/LXDE-pi/autostart
 point-rpi
 @unclutter -idle 0
 @firefox -url  http://localhost:3000/d/uZDC-7zgk/rpi_meteo-testing-simple?orgId=1&refresh=1m&kiosk
-
+Do work:
+Use firefox_starter.service or start_firefox_with_delay, one of them probably works.
+Append "@unclutter -idle 0" to /etc/xdg/lxsession/LXDE-pi/autostart.
 
 Modify InfluxDB settings to reduce CPU and RAM usage.
 [data]
@@ -57,7 +61,15 @@ systemctl disable telegraf
 
 Grafana
 Install Clock plugin.
+sudo grafana-cli plugins install grafana-clock-panel
+sudo systemctl restart grafana-server
+Configure datasources
 
 
 Arduino UNO project in test folder is based on https://github.com/bjarne-hansen/py-nrf24/blob/master/arduino/simple-sender/simple-sender.ino
 Testing Python script rf24_receiver_01.py is based on https://github.com/bjarne-hansen/py-nrf24/blob/master/test/int-receiver.py
+
+usermod -a - G gpio pi
+usermod -a - G dialout pi
+usermod -a - G i2c pi
+Enable i2c and serial in "raspi-config".

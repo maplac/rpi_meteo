@@ -1,47 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_INFLUXDB-HOME",
-      "label": "InfluxDB-Home",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "influxdb",
-      "pluginName": "InfluxDB"
-    }
-  ],
-  "__elements": {},
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "9.0.5"
-    },
-    {
-      "type": "panel",
-      "id": "grafana-clock-panel",
-      "name": "Clock",
-      "version": "2.1.0"
-    },
-    {
-      "type": "datasource",
-      "id": "influxdb",
-      "name": "InfluxDB",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "timeseries",
-      "name": "Time series",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -67,14 +24,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 1,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB-HOME}"
+        "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
       },
       "gridPos": {
         "h": 4,
@@ -101,11 +58,12 @@
           "locale": "",
           "showDate": true
         },
+        "fontMono": false,
         "mode": "time",
         "refresh": "dashboard",
         "timeSettings": {
           "customFormat": "HH:mm",
-          "fontSize": "70px",
+          "fontSize": "65px",
           "fontWeight": "bold"
         },
         "timezone": "",
@@ -116,14 +74,14 @@
           "zoneFormat": "offsetAbbv"
         }
       },
-      "pluginVersion": "2.1.0",
+      "pluginVersion": "2.1.3",
       "transparent": true,
       "type": "grafana-clock-panel"
     },
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB-HOME}"
+        "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
       },
       "description": "",
       "fieldConfig": {
@@ -131,6 +89,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 1,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -169,12 +128,12 @@
         },
         "textMode": "value"
       },
-      "pluginVersion": "9.0.5",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB-HOME}"
+            "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
           },
           "groupBy": [
             {
@@ -225,7 +184,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB-HOME}"
+        "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
       },
       "description": "",
       "fieldConfig": {
@@ -271,12 +230,12 @@
         },
         "textMode": "value"
       },
-      "pluginVersion": "9.0.5",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB-HOME}"
+            "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
           },
           "groupBy": [
             {
@@ -327,7 +286,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB-HOME}"
+        "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
       },
       "description": "",
       "fieldConfig": {
@@ -335,6 +294,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -373,12 +333,12 @@
         },
         "textMode": "value"
       },
-      "pluginVersion": "9.0.5",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB-HOME}"
+            "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
           },
           "groupBy": [
             {
@@ -429,7 +389,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB-HOME}"
+        "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
       },
       "description": "",
       "fieldConfig": {
@@ -437,6 +397,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 1,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -475,12 +436,12 @@
         },
         "textMode": "value"
       },
-      "pluginVersion": "9.0.5",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB-HOME}"
+            "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
           },
           "groupBy": [
             {
@@ -531,7 +492,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB-HOME}"
+        "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
       },
       "description": "",
       "fieldConfig": {
@@ -539,6 +500,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 1,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -577,12 +539,12 @@
         },
         "textMode": "value"
       },
-      "pluginVersion": "9.0.5",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB-HOME}"
+            "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
           },
           "groupBy": [
             {
@@ -633,7 +595,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB-HOME}"
+        "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
       },
       "description": "",
       "fieldConfig": {
@@ -641,6 +603,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 2,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -679,12 +642,12 @@
         },
         "textMode": "value"
       },
-      "pluginVersion": "9.0.5",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB-HOME}"
+            "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
           },
           "groupBy": [
             {
@@ -735,7 +698,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB-HOME}"
+        "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
       },
       "fieldConfig": {
         "defaults": {
@@ -744,6 +707,8 @@
             "mode": "fixed"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisGridShow": true,
             "axisLabel": "",
             "axisPlacement": "right",
@@ -815,8 +780,9 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "tooltip": {
           "mode": "single",
@@ -827,7 +793,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB-HOME}"
+            "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
           },
           "groupBy": [
             {
@@ -873,7 +839,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB-HOME}"
+            "uid": "f30540bd-691d-4565-8fbd-755f9b12b505"
           },
           "groupBy": [
             {
@@ -921,8 +887,8 @@
       "type": "timeseries"
     }
   ],
-  "refresh": false,
-  "schemaVersion": 36,
+  "refresh": "1m",
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -936,6 +902,6 @@
   "timezone": "",
   "title": "rpi_meteo",
   "uid": "uZDC-7zgk",
-  "version": 50,
+  "version": 4,
   "weekStart": ""
 }

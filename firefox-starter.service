@@ -1,0 +1,15 @@
+  [Unit]
+  Description=Firefox service as startup app
+  BindsTo=graphical.target
+  PartOf=graphical.target
+  After=graphical.target x
+  Requires=grafana-server.service
+  
+  [Service]
+  Type=simple
+  Restart=on-failure
+  User=pi
+  ExecStart=firefox -url "http://localhost:3000/d/uZDC-7zgk/rpi_meteo-testing-simple?orgId=1&refresh=1m&kiosk"
+
+  [Install]
+  WantedBy=multi-user.target

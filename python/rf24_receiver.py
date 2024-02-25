@@ -26,9 +26,9 @@ def gpio_interrupt(gpio):
         payload = nrf.get_payload()
         
         # Show message received as hex.
-        #now = datetime.now()
-        #hex = ':'.join(f'{i:02x}' for i in payload)
-        #print(f"{now:%Y-%m-%d %H:%M:%S.%f}: pipe: {pipe}, len: {len(payload)}, bytes: {hex}, count: {count}")
+        now = datetime.now()
+        hex = ':'.join(f'{i:02x}' for i in payload)
+        print(f"{now:%Y-%m-%d %H:%M:%S.%f}: pipe: {pipe}, len: {len(payload)}, bytes: {hex}")
 
         msg = [];
 

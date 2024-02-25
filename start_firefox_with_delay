@@ -1,0 +1,3 @@
+#! /usr/bin/bash
+sleep 20
+firefox -url "http://localhost:3000/d/uZDC-7zgk/rpi_meteo-testing-simple?orgId=1&refresh=1m&kiosk"
